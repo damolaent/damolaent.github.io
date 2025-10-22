@@ -61,6 +61,12 @@ Let’s assume Alice wants to send a secret message `"baby"` to Bob. We will use
 
 From the ASCII table:
 
+<figure>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/ASCII_Table_%28suitable_for_printing%29.svg/1280px-ASCII_Table_%28suitable_for_printing%29.svg.png">
+  <figcaption>Figure 1: ASCII Table (source: Wikipedia)</figcaption>
+</figure>
+
+
 | Character | Decimal | Binary   |
 |------------|----------|----------|
 | b          | 98       | 1100010  |
