@@ -18,11 +18,13 @@ In the early days of global espionage and wartime intelligence, secrecy was not 
 
 First patented in 1919 by Gilbert Vernam and Joseph Mauborgne, the One-Time Pad introduced the concept of *perfect secrecy*: a message so well-encrypted that no amount of computation or analysis could reveal the original text without the exact key. It was famously used in diplomatic and military communications, including by the Soviet Union during the Cold War.
 
-Despite its age, the OTP continues to intrigue modern cryptographers and mathematicians alike. Its simplicity hides a profound mathematical truth — that security can be absolute, but only under uncompromising conditions. Before diving into how the One-Time Pad works, it’s essential to understand the fundamental concepts of **encryption** and **decryption**, which form the bedrock of all secure communication systems.
+Despite its age, the OTP continues to intrigue modern cryptographers and mathematicians alike. Its simplicity hides a profound mathematical truth that security can be absolute, but only under uncompromising conditions. 
+
+Before diving into how the One-Time Pad works, it’s essential to understand the fundamental concepts of **encryption** and **decryption**, which form the bedrock of all secure communication systems.
 
 ## Encryption and Decryption
 
-Before delving into the technical definition of One-Time Pads (OTPs), it is essential to establish a fundamental understanding of **encryption** and **decryption** algorithms. This section provides a concise overview of these core cryptographic processes, laying the groundwork for a deeper discussion on OTPs — one of the few encryption systems that remains mathematically unbreakable.
+TO understand OTPs, it is essential to establish a fundamental understanding of **encryption** and **decryption** algorithms. This section provides a concise overview of these core cryptographic processes, laying the groundwork for a deeper discussion on One Time Pads.
 
 **Encryption** (denoted as `E`) is the process of transforming a plaintext message into an unreadable format called *ciphertext*, such that only authorized parties can recover the original information. The goal is to ensure confidentiality and integrity of communication in the presence of eavesdroppers.
 
@@ -30,19 +32,11 @@ A **key** `k` is used in conjunction with an encryption algorithm `E` to encode 
 
 ```E(k ∈ K, m ∈ M) = c```
 
-
 To recover the original message, the recipient uses the corresponding **decryption** algorithm `D`, which is the inverse of `E`:
 
 ```D(k ∈ K, c ∈ C) = m```
 
-
-In practice, once Alice encrypts a message using a shared secret key `k`, only Bob — who possesses the same key — can decrypt it to obtain the original message. This *symmetric nature* of encryption ensures secure communication, provided the key remains secret.
-
-A detailed discussion on encryption and decryption algorithms will be covered in a subsequent article.
-
-## One-Time Pad: Definition and Theory
-
-The **One-Time Pad (OTP)** represents a special form of symmetric encryption that has been mathematically proven to be unbreakable. Originating in the early 20th century, OTPs were notably utilized during wartime for highly confidential communications. Despite their simplicity, OTPs remain theoretically perfect in terms of cryptographic security.
+In practice, once Alice encrypts a message using a shared secret key `k`, only Bob whom possesses the same key can decrypt it to obtain the original message. This *symmetric nature* of encryption ensures secure communication, provided the key remains secret.
 
 ## Properties of a Perfect One-Time Pad
 
