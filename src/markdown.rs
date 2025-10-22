@@ -15,6 +15,7 @@ pub struct PostFrontMatter {
     pub date: String,
     pub author: String,
     pub description: Option<String>,
+    pub category: Option<String>,
 }
 
 /// Front matter for a generic page (like About).

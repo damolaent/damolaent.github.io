@@ -3,6 +3,7 @@ title: "Build A Deflationary ERC20 Token From Scratch - No dependencies"
 date: "2025-08-12"
 author: "Icon The Great"
 description: "how to write a deflationary erc20 from scratch with no dependencies"
+category: "Ethereum"
 ---
 
 This post takes a deep dive into ```MyDeflationaryToken```, a Solidity contract that implements an ERC20-like token with a built-in deflationary fee system. The idea is straightforward: every transfer charges a fee, which is split into a burn portion, a treasury portion, and a hodlers reward portion. 
@@ -11,7 +12,7 @@ The burn portion permanently reduces the supply, creating a deflationary effect 
 
 We will go through the contract’s structure, variables, and functions, explaining what each part does and why it is there.
 
-#### GETTING STARTED
+## GETTING STARTED
 
 To get started we need to have foundry installed on our computer. To install foundry run:
 ```javascript

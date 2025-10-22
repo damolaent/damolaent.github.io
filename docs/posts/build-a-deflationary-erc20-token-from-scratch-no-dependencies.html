@@ -46,9 +46,12 @@
     <!-- Right side: links -->
     <ul class='nav-links' id='navLinks'>
       <li><a href='../index.html'>Home</a></li>
-      <li><a href='../posts.html'>Posts</a></li>
       <li><a href='../about.html'>About</a></li>
-      <li><a href='../license.html'>License</a></li>
+      <li><a href='../cryptography.html'>Cryptography</a></li>
+      <li><a href='../ethereum.html'>Ethereum</a></li>
+      <li><a href='../blockchain.html'>Blockchain</a></li>
+      <li><a href='../computing.html'>Computing</a></li>
+
     </ul>
 
     <!-- Hamburger Button (hidden on large screens) -->
@@ -66,7 +69,7 @@
                                          <p>This post takes a deep dive into <code>MyDeflationaryToken</code>, a Solidity contract that implements an ERC20-like token with a built-in deflationary fee system. The idea is straightforward: every transfer charges a fee, which is split into a burn portion, a treasury portion, and a hodlers reward portion.</p>
 <p>The burn portion permanently reduces the supply, creating a deflationary effect over time.</p>
 <p>We will go through the contract’s structure, variables, and functions, explaining what each part does and why it is there.</p>
-<h4>GETTING STARTED</h4>
+<h2>GETTING STARTED</h2>
 <p>To get started we need to have foundry installed on our computer. To install foundry run:</p>
 <pre class="line-numbers"><code class="language-javascript"># Download foundry installer foundryup
 curl -L https://foundry.paradigm.xyz | bash

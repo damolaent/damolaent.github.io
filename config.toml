@@ -1,7 +1,7 @@
 # Site Configuration
 [site]
 title = "ICON"  # Change this to your website's title
-description = "obsessed with code"  # Short description of yourself
+description = "cypherpunk"  # Short description of yourself
 author = "ICON"  # Enter your name
 author_glitch_effect = false  # Enable glitch animation for the author name on the index page
 profile_picture = "assets/img/ICON.jpg"  # Place your image in the "assets/img/" directory and update the reference here, or provide the URL of your Twitter profile picture
