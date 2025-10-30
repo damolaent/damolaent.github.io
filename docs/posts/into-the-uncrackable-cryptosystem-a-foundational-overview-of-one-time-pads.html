@@ -65,7 +65,7 @@
 </header>
 <main class='container'>
 <h1>Into the Uncrackable Cryptosystem: A Foundational Overview of One-Time Pads</h1>
-                                         <p><strong>By Icon The Great</strong> - 2025-10-22 - 6 min read</p>
+                                         <p><strong>By Icon The Great</strong> - 2025-10-22 - 8 min read</p>
                                          <p><em>This article is part of an ongoing research series exploring foundational cryptographic systems, their mathematical underpinnings, and their modern relevance.</em></p>
 <h2>Abstract</h2>
 <p>This article explores the <strong>One-Time Pad (OTP)</strong> :- a cryptographic scheme proven to offer <em>perfect secrecy</em> when implemented correctly. We discuss its mathematical foundations, encryption and decryption processes, historical applications, and practical limitations. Through examples and comparisons, we examine why the OTP remains both a theoretical ideal and a practical challenge in modern cryptography.</p>
@@ -147,7 +147,167 @@ Exclusive OR (XOR), or <em>logical inequality</em>, is a binary operation that o
 </tbody></table>
 <p>Result: <strong>“baby”</strong> — the original plaintext message.</p>
 <h2>Example Implementation in Rust</h2>
-<p><em>(Coming soon: a full Rust code example demonstrating the OTP encryption and decryption process.)</em></p>
+<p><code>impls.rs</code></p>
+<pre class="line-numbers"><code class="language-rust">use rand::Rng;
+use serde::{Deserialize, Serialize};
+use std::fs;
+use std::io::{self, Write};
+
+// ---------- Core Logic ----------
+
+pub fn to_ascii(input: String) -&gt; Vec&lt;u8&gt; {
+    input.chars().map(|c| c as u8).collect()
+}
+
+pub fn to_binary(input: Vec&lt;u8&gt;) -&gt; Vec&lt;String&gt; {
+    input.iter().map(|b| format!("{:08b}", b)).collect()
+}
+
+pub fn xoring(input: Vec&lt;String&gt;, key: Vec&lt;String&gt;) -&gt; Vec&lt;u8&gt; {
+    input
+        .iter()
+        .enumerate()
+        .map(|(i, byte)| {
+            let b1 = u8::from_str_radix(byte, 2).unwrap();
+            let b2 = u8::from_str_radix(&amp;key[i % key.len()], 2).unwrap();
+            b1 ^ b2
+        })
+        .collect()
+}
+
+pub fn generate_random_key_of_same_length(ascii: Vec&lt;u8&gt;) -&gt; Vec&lt;u8&gt; {
+    let mut rng = rand::rng();
+    (0..ascii.len())
+        .map(|_| rng.random_range(0..=255))
+        .collect()
+}
+
+pub fn encrypt(input: String, key: Vec&lt;u8&gt;) -&gt; Vec&lt;u8&gt; {
+    let ascii = to_ascii(input);
+    let ascii_binary = to_binary(ascii.clone());
+    let key_binary = to_binary(key.clone());
+    xoring(ascii_binary, key_binary)
+}
+
+pub fn decrypt(cipher_bytes: Vec&lt;u8&gt;, key: Vec&lt;u8&gt;) -&gt; String {
+    let cipher_binary = to_binary(cipher_bytes);
+    let key_binary = to_binary(key);
+    let xored = xoring(cipher_binary, key_binary);
+    xored.iter().map(|&amp;b| b as char).collect()
+}
+
+// ---------- HEX HELPERS ----------
+// Convert bytes to hex string and vice versa
+
+pub fn to_hex(bytes: &amp;[u8]) -&gt; String {
+    bytes
+        .iter()
+        .map(|b| format!("{:02X}", b))
+        .collect::&lt;Vec&lt;String&gt;&gt;()
+        .join("")
+}
+
+pub fn from_hex(s: &amp;str) -&gt; Vec&lt;u8&gt; {
+    s.as_bytes()
+        .chunks(2)
+        .map(|pair| u8::from_str_radix(std::str::from_utf8(pair).unwrap(), 16).unwrap())
+        .collect()
+}
+
+// ---------- JSON STRUCTS ----------
+
+#[derive(Serialize, Deserialize)]
+pub struct CipherData {
+    pub cipher_hex: String,
+    pub key_hex: String,
+    pub plaintext_hint: Option&lt;String&gt;, // optional field to remind what it was
+}
+
+// ---------- File Helpers ----------
+
+pub fn save_to_json(filename: &amp;str, data: &amp;CipherData) -&gt; io::Result&lt;()&gt; {
+    let json = serde_json::to_string_pretty(data).unwrap();
+    let mut file = fs::File::create(filename)?;
+    file.write_all(json.as_bytes())?;
+    Ok(())
+}
+
+pub fn load_from_json(filename: &amp;str) -&gt; io::Result&lt;CipherData&gt; {
+    let contents = fs::read_to_string(filename)?;
+    let data: CipherData = serde_json::from_str(&amp;contents).unwrap();
+    Ok(data)
+}
+
+</code></pre>
+<p><code>main.rs</code></p>
+<pre class="line-numbers"><code class="language-rust">mod impls;
+use impls::*;
+use std::io;
+
+fn main() {
+    println!("Do you want to (E)ncrypt or (D)ecrypt?");
+    let mut choice = String::new();
+    io::stdin().read_line(&amp;mut choice).unwrap();
+    let choice = choice.trim().to_lowercase();
+
+    if choice == "e" || choice == "encrypt" {
+        println!("Enter plaintext:");
+        let mut plaintext = String::new();
+        io::stdin().read_line(&amp;mut plaintext).unwrap();
+        let plaintext = plaintext.trim().to_string();
+
+        let ascii = to_ascii(plaintext.clone());
+        let key = generate_random_key_of_same_length(ascii.clone());
+        let cipher_bytes = encrypt(plaintext.clone(), key.clone());
+
+        let cipher_hex = to_hex(&amp;cipher_bytes);
+        let key_hex = to_hex(&amp;key);
+
+        println!("\n✅ Encryption complete!");
+        println!("Plaintext: {}", plaintext);
+        println!("Cipher (hex): {}", cipher_hex);
+        println!("Key (hex): {}", key_hex);
+
+        // Save to file
+        let data = CipherData {
+            cipher_hex: cipher_hex.clone(),
+            key_hex: key_hex.clone(),
+            plaintext_hint: Some(plaintext.clone()),
+        };
+
+        println!("\nEnter filename to save (e.g. secret.json):");
+        let mut filename = String::new();
+        io::stdin().read_line(&amp;mut filename).unwrap();
+        let filename = filename.trim();
+
+        if let Err(err) = save_to_json(filename, &amp;data) {
+            eprintln!("❌ Failed to save file: {}", err);
+        } else {
+            println!("💾 Saved to '{}'", filename);
+        }
+    } else if choice == "d" || choice == "decrypt" {
+        println!("Enter filename of JSON to decrypt (e.g. secret.json):");
+        let mut filename = String::new();
+        io::stdin().read_line(&amp;mut filename).unwrap();
+        let filename = filename.trim();
+
+        match load_from_json(filename) {
+            Ok(data) =&gt; {
+                let cipher_bytes = from_hex(&amp;data.cipher_hex);
+                let key_bytes = from_hex(&amp;data.key_hex);
+                let decrypted = decrypt(cipher_bytes, key_bytes);
+
+                println!("\n✅ Decryption complete!");
+                println!("Decrypted text: {}", decrypted);
+            }
+            Err(err) =&gt; eprintln!("❌ Failed to read file: {}", err),
+        }
+    } else {
+        println!("Invalid choice — please enter E or D.");
+    }
+}
+</code></pre>
+<p>you can run and play with the cli app, here is the full code on <a href="https://github.com/IconTheGreat/otp">Github</a></p>
 <h2>Limitations and Challenges</h2>
 <p>While the One-Time Pad is <strong>mathematically proven</strong> to be unbreakable under ideal conditions, it is <strong>impractical</strong> for widespread use. Some of its key challenges include:</p>
 <ul>

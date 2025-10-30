@@ -125,7 +125,173 @@ Result: **"baby"** — the original plaintext message.
 
 ## Example Implementation in Rust
 
-*(Coming soon: a full Rust code example demonstrating the OTP encryption and decryption process.)*
+```impls.rs```
+```rust
+use rand::Rng;
+use serde::{Deserialize, Serialize};
+use std::fs;
+use std::io::{self, Write};
+
+// ---------- Core Logic ----------
+
+pub fn to_ascii(input: String) -> Vec<u8> {
+    input.chars().map(|c| c as u8).collect()
+}
+
+pub fn to_binary(input: Vec<u8>) -> Vec<String> {
+    input.iter().map(|b| format!("{:08b}", b)).collect()
+}
+
+pub fn xoring(input: Vec<String>, key: Vec<String>) -> Vec<u8> {
+    input
+        .iter()
+        .enumerate()
+        .map(|(i, byte)| {
+            let b1 = u8::from_str_radix(byte, 2).unwrap();
+            let b2 = u8::from_str_radix(&key[i % key.len()], 2).unwrap();
+            b1 ^ b2
+        })
+        .collect()
+}
+
+pub fn generate_random_key_of_same_length(ascii: Vec<u8>) -> Vec<u8> {
+    let mut rng = rand::rng();
+    (0..ascii.len())
+        .map(|_| rng.random_range(0..=255))
+        .collect()
+}
+
+pub fn encrypt(input: String, key: Vec<u8>) -> Vec<u8> {
+    let ascii = to_ascii(input);
+    let ascii_binary = to_binary(ascii.clone());
+    let key_binary = to_binary(key.clone());
+    xoring(ascii_binary, key_binary)
+}
+
+pub fn decrypt(cipher_bytes: Vec<u8>, key: Vec<u8>) -> String {
+    let cipher_binary = to_binary(cipher_bytes);
+    let key_binary = to_binary(key);
+    let xored = xoring(cipher_binary, key_binary);
+    xored.iter().map(|&b| b as char).collect()
+}
+
+// ---------- HEX HELPERS ----------
+// Convert bytes to hex string and vice versa
+
+pub fn to_hex(bytes: &[u8]) -> String {
+    bytes
+        .iter()
+        .map(|b| format!("{:02X}", b))
+        .collect::<Vec<String>>()
+        .join("")
+}
+
+pub fn from_hex(s: &str) -> Vec<u8> {
+    s.as_bytes()
+        .chunks(2)
+        .map(|pair| u8::from_str_radix(std::str::from_utf8(pair).unwrap(), 16).unwrap())
+        .collect()
+}
+
+// ---------- JSON STRUCTS ----------
+
+#[derive(Serialize, Deserialize)]
+pub struct CipherData {
+    pub cipher_hex: String,
+    pub key_hex: String,
+    pub plaintext_hint: Option<String>, // optional field to remind what it was
+}
+
+// ---------- File Helpers ----------
+
+pub fn save_to_json(filename: &str, data: &CipherData) -> io::Result<()> {
+    let json = serde_json::to_string_pretty(data).unwrap();
+    let mut file = fs::File::create(filename)?;
+    file.write_all(json.as_bytes())?;
+    Ok(())
+}
+
+pub fn load_from_json(filename: &str) -> io::Result<CipherData> {
+    let contents = fs::read_to_string(filename)?;
+    let data: CipherData = serde_json::from_str(&contents).unwrap();
+    Ok(data)
+}
+
+```
+
+```main.rs```
+```rust
+mod impls;
+use impls::*;
+use std::io;
+
+fn main() {
+    println!("Do you want to (E)ncrypt or (D)ecrypt?");
+    let mut choice = String::new();
+    io::stdin().read_line(&mut choice).unwrap();
+    let choice = choice.trim().to_lowercase();
+
+    if choice == "e" || choice == "encrypt" {
+        println!("Enter plaintext:");
+        let mut plaintext = String::new();
+        io::stdin().read_line(&mut plaintext).unwrap();
+        let plaintext = plaintext.trim().to_string();
+
+        let ascii = to_ascii(plaintext.clone());
+        let key = generate_random_key_of_same_length(ascii.clone());
+        let cipher_bytes = encrypt(plaintext.clone(), key.clone());
+
+        let cipher_hex = to_hex(&cipher_bytes);
+        let key_hex = to_hex(&key);
+
+        println!("\n✅ Encryption complete!");
+        println!("Plaintext: {}", plaintext);
+        println!("Cipher (hex): {}", cipher_hex);
+        println!("Key (hex): {}", key_hex);
+
+        // Save to file
+        let data = CipherData {
+            cipher_hex: cipher_hex.clone(),
+            key_hex: key_hex.clone(),
+            plaintext_hint: Some(plaintext.clone()),
+        };
+
+        println!("\nEnter filename to save (e.g. secret.json):");
+        let mut filename = String::new();
+        io::stdin().read_line(&mut filename).unwrap();
+        let filename = filename.trim();
+
+        if let Err(err) = save_to_json(filename, &data) {
+            eprintln!("❌ Failed to save file: {}", err);
+        } else {
+            println!("💾 Saved to '{}'", filename);
+        }
+    } else if choice == "d" || choice == "decrypt" {
+        println!("Enter filename of JSON to decrypt (e.g. secret.json):");
+        let mut filename = String::new();
+        io::stdin().read_line(&mut filename).unwrap();
+        let filename = filename.trim();
+
+        match load_from_json(filename) {
+            Ok(data) => {
+                let cipher_bytes = from_hex(&data.cipher_hex);
+                let key_bytes = from_hex(&data.key_hex);
+                let decrypted = decrypt(cipher_bytes, key_bytes);
+
+                println!("\n✅ Decryption complete!");
+                println!("Decrypted text: {}", decrypted);
+            }
+            Err(err) => eprintln!("❌ Failed to read file: {}", err),
+        }
+    } else {
+        println!("Invalid choice — please enter E or D.");
+    }
+}
+```
+
+you can run and play with the cli app, here is the full code on [Github](https://github.com/IconTheGreat/otp)
+
+
 
 ## Limitations and Challenges
 
