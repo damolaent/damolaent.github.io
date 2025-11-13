@@ -1,7 +1,7 @@
 ---
 title: "Into the Uncrackable Cryptosystem: A Foundational Overview of One-Time Pads"
 date: "2025-10-22"
-author: "Icon The Great"
+author: "damola"
 description: "Understanding One-Time Pads (OTPs)"
 category: "Cryptography"
 ---
@@ -289,7 +289,7 @@ fn main() {
 }
 ```
 
-you can run and play with the cli app, here is the full code on [Github](https://github.com/IconTheGreat/otp)
+you can run and play with the cli app, here is the full code on [Github](https://github.com/damolaent/otp)
 
 
 

@@ -1,19 +1,10 @@
 # Site Configuration
 [site]
-title = "ICON"  # Change this to your website's title
-description = "cypherpunk"  # Short description of yourself
-author = "ICON"  # Enter your name
-author_glitch_effect = false  # Enable glitch animation for the author name on the index page
-profile_picture = "assets/img/ICON.jpg"  # Place your image in the "assets/img/" directory and update the reference here, or provide the URL of your Twitter profile picture
-base_url = "https://IconTheGreat.github.io"  # The full URL where your site is hosted (used for sitemap.xml and SEO metadata). Example: "https://0xh4ty.github.io" or "https://myblog.com"
-# Optional: specify a dedicated OG image (1200x630 recommended) for better link previews on Twitter, Telegram, Discord, etc.
-# If not specified, the profile_picture will be used as the fallback OG image.
-# Example:
-# og_image = "assets/img/og-default.png"
+base_url = "https://damolaent.github.io"  # The full URL where site will be hosted
 
 # Navigation Links
 [links]
-github = "https://github.com/IconTheGreat"  # Replace with your GitHub profile link (e.g., "https://github.com/yourusername")
+github = "https://github.com/damolaent"  # Replace with your GitHub profile link (e.g., "https://github.com/yourusername")
 twitter = "https://twitter.com/Icon_The_Great"  # Replace with your Twitter profile link (e.g., "https://twitter.com/yourusername")
 
 # Analytics

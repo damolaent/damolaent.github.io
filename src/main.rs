@@ -25,14 +25,15 @@ struct SiteConfig {
 /// Holds site metadata like title, description, etc.
 #[derive(Deserialize)]
 struct SiteInfo {
-    title: String,
-    description: String,
-    author: String,
-    author_glitch_effect: bool,
-    profile_picture: String,
+    title: Option<String>,
+    description: Option<String>,
+    author: Option<String>,
+    author_glitch_effect: Option<bool>,
+    profile_picture: Option<String>,
     base_url: String,
     og_image: Option<String>,
 }
+
 
 /// Holds external links
 #[derive(Deserialize)]
@@ -197,10 +198,11 @@ fn wrap_in_template(
     };
     // Determine OG image URL: use og_image if present, else profile_picture
     let og_image_path = config
-        .site
-        .og_image
-        .as_deref()
-        .unwrap_or(&config.site.profile_picture);
+    .site
+    .og_image
+    .as_deref()
+    .unwrap_or(config.site.profile_picture.as_deref().unwrap_or(""));
+
     let og_image_url = format!(
         "{}/{}",
         config.site.base_url.trim_end_matches('/'),
@@ -303,7 +305,7 @@ fn wrap_in_template(
         page_url = page_url,
         prefix = prefix,
         body_content = body_content,
-        author = config.site.author,
+        author = config.site.author.as_deref().unwrap_or(""),
         github = config.links.github,
         twitter = config.links.twitter
     )
@@ -345,33 +347,11 @@ fn generate_index(posts: &Vec<Post>, config: &SiteConfig) {
     let mut sorted_posts = posts.clone();
     sorted_posts.sort_by(|a, b| b.front_matter.date.cmp(&a.front_matter.date));
 
-    let author_html = if config.site.author_glitch_effect {
-        format!(
-            "<h2 class='profile-name hero glitch layers' data-text='{author}'>
-                <span>{author}</span>
-            </h2>",
-            author = config.site.author
-        )
-    } else {
-        format!(
-            "<h2 class='profile-name'>{author}</h2>",
-            author = config.site.author
-        )
-    };
-
-    // Build the "Recent Posts" list
-    let mut recent_posts_html = format!(
-        "<div class='profile-container'>
-            <img class='profile-img' src='{profile_picture}' alt='Profile Picture'>
-            {author_html}
-            <p class='profile-desc'>{description}</p>
-        </div>
-        <div class='recent-posts'>
-        <h3>Recent Posts</h3>
-        <ul>",
-        profile_picture = config.site.profile_picture,
-        author_html = author_html,
-        description = config.site.description,
+    // Removed profile picture + author section
+    let mut recent_posts_html = String::from(
+        "<div class='recent-posts'>
+            <h3>Recent Posts</h3>
+            <ul>"
     );
 
     for post in sorted_posts.iter().take(5) {
@@ -400,23 +380,23 @@ fn generate_index(posts: &Vec<Post>, config: &SiteConfig) {
         </div>",
     );
 
-    // Wrap the "recent_posts_html" in the global template
+    // Wrap the final HTML
     let final_html = wrap_in_template(
-        &config.site.title,
-        &config.site.description,
+    config.site.title.as_deref().unwrap_or(""),
+    config.site.description.as_deref().unwrap_or(""),
         &recent_posts_html,
         "",
         "/",
         config,
     );
 
-    // Write to `docs/index.html`
     let mut file = fs::File::create("docs/index.html").expect("Failed to create docs/index.html");
     file.write_all(final_html.as_bytes())
         .expect("Failed to write index.html");
 
     println!("Generated: docs/index.html");
 }
+
 
 /// Generate `posts.html` listing all posts grouped by year
 fn generate_posts(posts: &Vec<Post>, config: &SiteConfig) {

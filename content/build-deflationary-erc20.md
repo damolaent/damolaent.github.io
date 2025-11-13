@@ -1,7 +1,7 @@
 ---
 title: "Build A Deflationary ERC20 Token From Scratch - No dependencies"
 date: "2025-08-12"
-author: "Icon The Great"
+author: "damola"
 description: "how to write a deflationary erc20 from scratch with no dependencies"
 category: "Ethereum"
 ---
